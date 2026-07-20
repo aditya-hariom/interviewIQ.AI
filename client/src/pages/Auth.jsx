@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
 
-function Auth() {
+function Auth({isModel = false}) {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
