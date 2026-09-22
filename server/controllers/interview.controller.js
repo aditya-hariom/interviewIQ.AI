@@ -136,14 +136,10 @@ export const generateQuestion = async (req, res) => {
         Generate exactly 5 interview questions.
         
         Strict Rules:
-        -Each question must contain between 15 and 25 words.
-        -Each question must be a single complete sentence.
-        -Do NOT number them.
-        -Do NOT add explanations.
-        -Do NOT add extra text before or after.
-        -One question per line only.
-        -Keep language simple and conversational.
-        -Questions must feel practical and realistic.
+        - Each question must contain between 15 and 25 words.
+        - Each question must be a single complete sentence.
+        - Keep language simple and conversational.
+        - Questions must feel practical and realistic.
 
         Difficulty progression:
         Question 1 → easy  
@@ -153,8 +149,11 @@ export const generateQuestion = async (req, res) => {
         Question 5 → hard  
 
         Make questions based on the candidate’s 
-        role, experience,interviewMode, projects, 
+        role, experience, interviewMode, projects, 
         skills, and resume details.
+
+        Return strictly a JSON array containing exactly 5 question strings without markdown, formatting, or extra text:
+        ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"]
         `,
       },
       {
@@ -171,13 +170,22 @@ export const generateQuestion = async (req, res) => {
       });
     }
 
-    const questionsArray = aiResponse
-      .split("\n")
-      .map((q) => q.trim())
-      .filter((q) => q.length > 0)
-      .slice(0, 5);
+    let questionsArray = [];
+    try {
+      const cleaned = aiResponse
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/g, "")
+        .trim();
+      questionsArray = JSON.parse(cleaned);
+    } catch (e) {
+      questionsArray = aiResponse
+        .split("\n")
+        .map((q) => q.replace(/^\d+[\.\)]\s*/, "").trim())
+        .filter((q) => q.length > 10)
+        .slice(0, 5);
+    }
 
-    if (questionsArray.length === 0) {
+    if (!Array.isArray(questionsArray) || questionsArray.length === 0) {
       return res.status(500).json({
         message: "AI failed to generate questions.",
       });

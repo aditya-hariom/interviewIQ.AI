@@ -14,7 +14,7 @@ import { setUserData } from "../redux/userSlice";
 
 function Step1SetUp({ onStart }) {
   
-  const {userData} = useSelector((state)=>state.use)
+  const { userData } = useSelector((state) => state.user || {});
   const dispatch = useDispatch();
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("");
@@ -83,6 +83,7 @@ function Step1SetUp({ onStart }) {
       onStart(result.data);
     } catch (error) {
       console.log(error.response?.data);
+      alert(error.response?.data?.message || "Failed to start interview. Please try again.");
       setLoading(false);
     }
   };
